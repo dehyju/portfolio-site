@@ -12,7 +12,7 @@ const ComingSoon = () => {
       </p>
       <div className="flex items-center space-x-6 mt-6">
         <a href="https://github.com/dehyju" className="text-4xl hover:text-gray-400" target="_blank" rel="noopener noreferrer"><FaGithub /></a>
-        <a href="mailto:stephen.t.j.leong@gmail.com" className="text-4xl hover:text-gray-400"><IoIosMail /></a>
+        <a href="mailto:enquire@stephenleong.co.uk" className="text-4xl hover:text-gray-400"><IoIosMail /></a>
         <a href="https://www.linkedin.com/in/stephen-t-j-leong" className="text-4xl hover:text-gray-400" target="_blank" rel="noopener noreferrer"><FaLinkedin /></a>
       </div>
     </div>
