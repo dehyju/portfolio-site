@@ -9,7 +9,7 @@ function App() {
 
   return (
     <>
-      <Routes location="/">
+      <Routes>
         <Route index element={<ComingSoon />} />
         {/* {<Route path="/contact" element={<Contact />} />} */}
         <Route path='*' element={<Navigate to="/" replace />} />
