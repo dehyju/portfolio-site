@@ -1,4 +1,2 @@
 # wrangler.toml
-name = 'portfolio'
-compatibility_date = "2025-11-18"
-pages_build_output_dir = "dist"
+name = 'portfolio-site'
