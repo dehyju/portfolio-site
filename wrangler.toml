@@ -1,0 +1,7 @@
+name = "portfolio-site"
+compatibility_date = "2025-11-18"
+
+pages_build_output_dir = "dist"
+
+[site]
+bucket = "./dist"
