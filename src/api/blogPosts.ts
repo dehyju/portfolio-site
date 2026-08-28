@@ -17,15 +17,11 @@ export async function getBlogPosts(limit?: number): Promise<BlogPost[]> {
   const { supabase } = await import('@/utils/supabase');
   
   try {
-    let query = supabase
+    const query = supabase
       .from('blog_posts')
       .select('*')
       .eq('published', true)
       .order('published_at', { ascending: false });
-    
-    if (limit) {
-      query = query.limit(limit);
-    }
     
     const { data, error } = await query;
     
@@ -34,7 +30,13 @@ export async function getBlogPosts(limit?: number): Promise<BlogPost[]> {
       return [];
     }
     
-    return data || [];
+    // Sort pinned posts to the top, then by published date
+    const sorted = (data || []).sort((a, b) => {
+      if (a.pinned === b.pinned) return 0;
+      return a.pinned ? -1 : 1;
+    });
+    
+    return limit ? sorted.slice(0, limit) : sorted;
   } catch (error) {
     console.error('Failed to fetch blog posts:', error);
     return [];
@@ -46,14 +48,10 @@ export async function getAllBlogPosts(limit?: number): Promise<BlogPost[]> {
   const { supabase } = await import('@/utils/supabase');
   
   try {
-    let query = supabase
+    const query = supabase
       .from('blog_posts')
       .select('*')
       .order('created_at', { ascending: false });
-    
-    if (limit) {
-      query = query.limit(limit);
-    }
     
     const { data, error } = await query;
     
@@ -62,7 +60,13 @@ export async function getAllBlogPosts(limit?: number): Promise<BlogPost[]> {
       return [];
     }
     
-    return data || [];
+    // Sort pinned posts to the top, then by created date
+    const sorted = (data || []).sort((a, b) => {
+      if (a.pinned === b.pinned) return 0;
+      return a.pinned ? -1 : 1;
+    });
+    
+    return limit ? sorted.slice(0, limit) : sorted;
   } catch (error) {
     console.error('Failed to fetch blog posts:', error);
     return [];
@@ -102,7 +106,7 @@ export async function incrementViewCount(slug: string): Promise<void> {
 }
 
 // Admin functions for creating/updating/deleting posts
-export async function createBlogPost(post: Omit<BlogPost, 'id' | 'created_at' | 'view_count'>): Promise<{ data: BlogPost | null; error: any }> {
+export async function createBlogPost(post: Omit<BlogPost, 'id' | 'created_at' | 'view_count'>): Promise<{ data: BlogPost | null; error: Error | null }> {
   const { supabase } = await import('@/utils/supabase');
   
   const { data, error } = await supabase
@@ -114,7 +118,7 @@ export async function createBlogPost(post: Omit<BlogPost, 'id' | 'created_at' | 
   return { data, error };
 }
 
-export async function updateBlogPost(id: string, post: Partial<BlogPost>): Promise<{ data: BlogPost | null; error: any }> {
+export async function updateBlogPost(id: string, post: Partial<BlogPost>): Promise<{ data: BlogPost | null; error: Error | null }> {
   const { supabase } = await import('@/utils/supabase');
   
   const { data, error } = await supabase
@@ -127,7 +131,7 @@ export async function updateBlogPost(id: string, post: Partial<BlogPost>): Promi
   return { data, error };
 }
 
-export async function deleteBlogPost(id: string): Promise<{ error: any }> {
+export async function deleteBlogPost(id: string): Promise<{ error: Error | null }> {
   const { supabase } = await import('@/utils/supabase');
   
   const { error } = await supabase

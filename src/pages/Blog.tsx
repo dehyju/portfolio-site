@@ -8,6 +8,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { Badge } from "@/components/ui/badge";
 import { Spinner } from "@/components/ui/spinner";
 import { FaClock, FaEye, FaFileAlt } from "react-icons/fa";
+import { BsPinAngleFill } from "react-icons/bs";
 
 const Blog = () => {
   const { user } = useAuth();
@@ -73,6 +74,9 @@ const Blog = () => {
                             <CardTitle className="text-2xl text-white hover:text-blue-400 transition-colors">
                               {post.title}
                             </CardTitle>
+                            {post.pinned && (
+                              <BsPinAngleFill className="text-yellow-500 w-5 h-5" title="Pinned" />
+                            )}
                             {!post.published && user && (
                               <Badge variant="secondary" className="bg-yellow-600 text-white">
                                 <FaFileAlt className="mr-1" />

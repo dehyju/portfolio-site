@@ -7,7 +7,7 @@ type AuthContextType = {
   user: User | null;
   session: Session | null;
   loading: boolean;
-  signIn: (email: string, password: string) => Promise<{ error: any }>;
+  signIn: (email: string, password: string) => Promise<{ error: Error | null }>;
   signOut: () => Promise<void>;
 };
 
@@ -57,6 +57,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   );
 }
 
+/* eslint-disable-next-line react-refresh/only-export-components */
 export function useAuth() {
   const context = useContext(AuthContext);
   if (context === undefined) {

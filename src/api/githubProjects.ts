@@ -11,7 +11,7 @@ export type Project = {
 export async function getGitHubProjects(username: string, limit?: number): Promise<Project[]> {
     try {
         // Fetch all repos from all pages (GitHub limits to 100 per page)
-        let allRepos: any[] = [];
+        let allRepos: Project[] = [];
         let page = 1;
         let hasMore = true;
         

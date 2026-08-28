@@ -11,7 +11,7 @@ import type { BlogPost } from '@/api/blogPosts';
 import ReactMarkdown from 'react-markdown';
 import remarkGfm from 'remark-gfm';
 import { FaEye } from 'react-icons/fa';
-import { TiPin } from "react-icons/ti";
+import { BsPinAngleFill } from 'react-icons/bs';
 
 const Admin = () => {
   const { signOut, user } = useAuth();
@@ -127,9 +127,9 @@ const Admin = () => {
       await fetchPosts();
       resetForm();
       setShowEditor(false);
-    } catch (error: any) {
+    } catch (error: unknown) {
       console.error('Error saving post:', error);
-      alert(error.message || 'Failed to save post. Check console for details.');
+      alert(error instanceof Error ? error.message : 'Failed to save post. Check console for details.');
     } finally {
       setSaving(false);
     }
@@ -336,7 +336,7 @@ const Admin = () => {
                             !pinned && pinnedCount >= 3 ? 'text-gray-500' : 'text-gray-300'
                           }`}
                         >
-                          <TiPin className="text-yellow-500" />
+                          <BsPinAngleFill className="text-yellow-500 w-4 h-4" />
                           Pin to top
                           {!pinned && pinnedCount >= 3 && (
                             <span className="text-xs text-red-400">(Max 3 reached)</span>
@@ -374,7 +374,7 @@ const Admin = () => {
                           <div className="flex items-center gap-2 mb-2">
                             <h3 className="text-xl font-semibold text-white">{post.title}</h3>
                             {post.pinned && (
-                              <TiPin className="text-yellow-500" title="Pinned" />
+                              <BsPinAngleFill className="text-yellow-500 w-5 h-5" title="Pinned" />
                             )}
                             {post.published ? (
                               <Badge className="bg-green-900 text-green-200">Published</Badge>
