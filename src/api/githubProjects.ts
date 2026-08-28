@@ -8,10 +8,21 @@ export type Project = {
     topics?: string[];
 };
 
+type GitHubRepo = {
+    name: string;
+    description: string | null;
+    html_url: string;
+    language: string | null;
+    stargazers_count: number;
+    forks_count: number;
+    topics: string[];
+    fork: boolean;
+};
+
 export async function getGitHubProjects(username: string, limit?: number): Promise<Project[]> {
     try {
         // Fetch all repos from all pages (GitHub limits to 100 per page)
-        let allRepos: Project[] = [];
+        let allRepos: GitHubRepo[] = [];
         let page = 1;
         let hasMore = true;
         
@@ -36,13 +47,13 @@ export async function getGitHubProjects(username: string, limit?: number): Promi
         }
         
         // Filter and map repos - only exclude forks, keep repos even without descriptions
-        const filteredRepos = allRepos
+        const filteredRepos: Project[] = allRepos
             .filter(repo => !repo.fork)
             .map(repo => ({
                 name: repo.name,
                 description: repo.description || 'No description provided',
                 url: repo.html_url,
-                language: repo.language,
+                language: repo.language || undefined,
                 stars: repo.stargazers_count,
                 forks: repo.forks_count,
                 topics: repo.topics || [],
