@@ -1,5 +1,5 @@
 import { useState, useEffect } from "react";
-import { useParams, Link, useNavigate } from "react-router-dom";
+import { useParams, Link } from "react-router-dom";
 import { getBlogPostBySlug, incrementViewCount, type BlogPost as BlogPostType } from "@/api/blogPosts";
 import { useAuth } from "@/contexts/AuthContext";
 import Navbar from "@/components/navbar";
@@ -13,7 +13,6 @@ import remarkGfm from "remark-gfm";
 const BlogPost = () => {
   const { slug } = useParams<{ slug: string }>();
   const { user } = useAuth();
-  const navigate = useNavigate();
   const [post, setPost] = useState<BlogPostType | null>(null);
   const [loading, setLoading] = useState(true);
   const [notFound, setNotFound] = useState(false);
