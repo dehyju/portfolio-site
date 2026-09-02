@@ -1,12 +1,12 @@
 import { useState, useEffect } from "react";
 import { useParams, Link } from "react-router-dom";
-import { getBlogPostBySlug, incrementViewCount, type BlogPost as BlogPostType } from "@/api/blogPosts";
+import { getBlogPostBySlug, type BlogPost as BlogPostType } from "@/api/blogPosts";
 import { useAuth } from "@/contexts/AuthContext";
 import Navbar from "@/components/navbar";
 import Footer from "@/components/Footer";
 import { Badge } from "@/components/ui/badge";
 import { Spinner } from "@/components/ui/spinner";
-import { FaClock, FaEye, FaCalendar, FaArrowLeft, FaFileAlt } from "react-icons/fa";
+import { FaClock, FaCalendar, FaArrowLeft, FaFileAlt } from "react-icons/fa";
 import ReactMarkdown from "react-markdown";
 import remarkGfm from "remark-gfm";
 
@@ -37,10 +37,6 @@ const BlogPost = () => {
             setNotFound(true);
           } else {
             setPost(blogPost);
-            // Only increment view count for published posts
-            if (blogPost.published) {
-              await incrementViewCount(slug);
-            }
           }
         }
       } catch (error) {
@@ -131,12 +127,6 @@ const BlogPost = () => {
               <span className="flex items-center gap-2">
                 <FaClock />
                 {post.reading_time_minutes} min read
-              </span>
-            )}
-            {post.view_count > 0 && (
-              <span className="flex items-center gap-2">
-                <FaEye />
-                {post.view_count} views
               </span>
             )}
           </div>

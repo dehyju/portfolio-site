@@ -7,7 +7,7 @@ import Footer from "@/components/Footer";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Spinner } from "@/components/ui/spinner";
-import { FaClock, FaEye, FaFileAlt } from "react-icons/fa";
+import { FaClock, FaFileAlt } from "react-icons/fa";
 import { BsPinAngleFill } from "react-icons/bs";
 
 const Blog = () => {
@@ -93,12 +93,6 @@ const Blog = () => {
                             <span className="flex items-center gap-1">
                               <FaClock />
                               {post.reading_time_minutes} min
-                            </span>
-                          )}
-                          {post.view_count > 0 && (
-                            <span className="flex items-center gap-1">
-                              <FaEye />
-                              {post.view_count}
                             </span>
                           )}
                         </div>

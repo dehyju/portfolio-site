@@ -384,7 +384,7 @@ const Admin = () => {
                           </div>
                           <p className="text-gray-400 text-sm mb-2">{post.excerpt}</p>
                           <p className="text-xs text-gray-500">
-                            Slug: {post.slug} • Views: {post.view_count} • {post.reading_time_minutes} min read
+                            Slug: {post.slug} • {post.reading_time_minutes} min read
                           </p>
                         </div>
                         <div className="flex gap-2 ml-4">
