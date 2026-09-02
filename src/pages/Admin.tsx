@@ -324,8 +324,7 @@ const Admin = () => {
                     />
                   </div>
 
-                  <div className="space-y-2">
-                    <label className="text-sm font-medium text-gray-300">Cover Image (thumbnail)</label>
+                  <div className="flex-col items-center space-y-2">
                     {coverImageUrl ? (
                       <div className="relative inline-block">
                         <img
@@ -355,6 +354,7 @@ const Admin = () => {
                         />
                       </label>
                     )}
+                    <p className="text-sm font-medium text-gray-300">Cover Image (thumbnail)</p>
                   </div>
 
                   {/* Content Editor with Preview */}
