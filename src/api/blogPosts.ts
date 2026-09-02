@@ -13,21 +13,28 @@ export type BlogPost = {
   cover_image_url: string | null;
 };
 
-// Uploads an image to the public 'blog-images' storage bucket and returns its public URL
+// Uploads an image to the public 'blog-images' storage bucket and returns its public URL.
+// Files are named by content hash, so re-uploading the same image reuses the existing object.
 export async function uploadBlogImage(file: File): Promise<string> {
   const { supabase } = await import('@/utils/supabase');
 
   const ext = file.name.split('.').pop() || 'png';
-  const path = `${crypto.randomUUID()}.${ext}`;
+  const digest = await crypto.subtle.digest('SHA-256', await file.arrayBuffer());
+  const hash = Array.from(new Uint8Array(digest)).map((b) => b.toString(16).padStart(2, '0')).join('');
+  const path = `${hash}.${ext}`;
+  const bucket = supabase.storage.from('blog-images');
 
-  const { error } = await supabase.storage.from('blog-images').upload(path, file, {
-    cacheControl: '3600',
+  const { error } = await bucket.upload(path, file, {
+    cacheControl: '31536000',
     upsert: false,
   });
 
-  if (error) throw error;
+  // A "duplicate" error just means this exact file was already uploaded — reuse it
+  if (error && !/duplicate|already exists/i.test(error.message)) {
+    throw error;
+  }
 
-  const { data } = supabase.storage.from('blog-images').getPublicUrl(path);
+  const { data } = bucket.getPublicUrl(path);
   return data.publicUrl;
 }
 
