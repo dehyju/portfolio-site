@@ -10,7 +10,26 @@ export type BlogPost = {
   reading_time_minutes: number;
   tags: string[];
   created_at: string;
+  cover_image_url: string | null;
 };
+
+// Uploads an image to the public 'blog-images' storage bucket and returns its public URL
+export async function uploadBlogImage(file: File): Promise<string> {
+  const { supabase } = await import('@/utils/supabase');
+
+  const ext = file.name.split('.').pop() || 'png';
+  const path = `${crypto.randomUUID()}.${ext}`;
+
+  const { error } = await supabase.storage.from('blog-images').upload(path, file, {
+    cacheControl: '3600',
+    upsert: false,
+  });
+
+  if (error) throw error;
+
+  const { data } = supabase.storage.from('blog-images').getPublicUrl(path);
+  return data.publicUrl;
+}
 
 export async function getBlogPosts(limit?: number): Promise<BlogPost[]> {
   const { supabase } = await import('@/utils/supabase');

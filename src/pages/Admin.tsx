@@ -1,4 +1,4 @@
-import { useState, useEffect, type FormEvent } from 'react';
+import { useState, useEffect, useRef, type FormEvent } from 'react';
 import { useAuth } from '@/contexts/AuthContext';
 import { supabase } from '@/utils/supabase';
 import Navbar from '@/components/navbar';
@@ -7,10 +7,10 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Card, CardHeader, CardTitle, CardContent } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
-import type { BlogPost } from '@/api/blogPosts';
+import { uploadBlogImage, type BlogPost } from '@/api/blogPosts';
 import ReactMarkdown from 'react-markdown';
 import remarkGfm from 'remark-gfm';
-import { FaEye } from 'react-icons/fa';
+import { FaEye, FaImage, FaTimes } from 'react-icons/fa';
 import { BsPinAngleFill } from 'react-icons/bs';
 
 const Admin = () => {
@@ -30,6 +30,10 @@ const Admin = () => {
   const [published, setPublished] = useState(false);
   const [pinned, setPinned] = useState(false);
   const [saving, setSaving] = useState(false);
+  const [coverImageUrl, setCoverImageUrl] = useState<string | null>(null);
+  const [uploadingCover, setUploadingCover] = useState(false);
+  const [uploadingInline, setUploadingInline] = useState(false);
+  const contentTextareaRef = useRef<HTMLTextAreaElement>(null);
 
   // Auto-calculate reading time (average 200 words per minute)
   const calculateReadingTime = (text: string): number => {
@@ -68,6 +72,7 @@ const Admin = () => {
     setPinned(false);
     setEditingPost(null);
     setShowPreview(false);
+    setCoverImageUrl(null);
   };
 
   const handleEdit = (post: BlogPost) => {
@@ -81,6 +86,56 @@ const Admin = () => {
     setPinned(post.pinned || false);
     setShowEditor(true);
     setShowPreview(false);
+    setCoverImageUrl(post.cover_image_url ?? null);
+  };
+
+  const handleCoverImageUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    e.target.value = '';
+    if (!file) return;
+
+    setUploadingCover(true);
+    try {
+      const url = await uploadBlogImage(file);
+      setCoverImageUrl(url);
+    } catch (error) {
+      console.error('Failed to upload cover image:', error);
+      alert('Failed to upload cover image. Check console for details.');
+    } finally {
+      setUploadingCover(false);
+    }
+  };
+
+  const handleInlineImageUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    e.target.value = '';
+    if (!file) return;
+
+    setUploadingInline(true);
+    try {
+      const url = await uploadBlogImage(file);
+      const markdown = `![${file.name.replace(/\.[^.]+$/, '')}](${url})`;
+      const textarea = contentTextareaRef.current;
+
+      if (textarea) {
+        const start = textarea.selectionStart;
+        const end = textarea.selectionEnd;
+        const next = content.slice(0, start) + markdown + content.slice(end);
+        setContent(next);
+        // Restore cursor position after the inserted markdown
+        requestAnimationFrame(() => {
+          textarea.focus();
+          textarea.setSelectionRange(start + markdown.length, start + markdown.length);
+        });
+      } else {
+        setContent((prev) => `${prev}\n${markdown}\n`);
+      }
+    } catch (error) {
+      console.error('Failed to upload image:', error);
+      alert('Failed to upload image. Check console for details.');
+    } finally {
+      setUploadingInline(false);
+    }
   };
 
   const handleSubmit = async (e: FormEvent) => {
@@ -104,6 +159,7 @@ const Admin = () => {
       pinned,
       reading_time_minutes: readingTime,
       published_at: published ? new Date().toISOString() : null,
+      cover_image_url: coverImageUrl,
     };
 
     try {
@@ -268,12 +324,59 @@ const Admin = () => {
                     />
                   </div>
 
+                  <div className="space-y-2">
+                    <label className="text-sm font-medium text-gray-300">Cover Image (thumbnail)</label>
+                    {coverImageUrl ? (
+                      <div className="relative inline-block">
+                        <img
+                          src={coverImageUrl}
+                          alt="Cover preview"
+                          className="h-40 w-auto rounded-md border border-gray-600 object-cover"
+                        />
+                        <button
+                          type="button"
+                          onClick={() => setCoverImageUrl(null)}
+                          className="absolute -top-2 -right-2 bg-red-600 hover:bg-red-700 rounded-full p-1.5 text-white"
+                          aria-label="Remove cover image"
+                        >
+                          <FaTimes className="w-3 h-3" />
+                        </button>
+                      </div>
+                    ) : (
+                      <label className="flex items-center gap-2 w-fit px-4 py-2 bg-gray-700 border border-gray-600 rounded-md text-sm text-gray-300 hover:bg-gray-600 cursor-pointer">
+                        <FaImage />
+                        {uploadingCover ? 'Uploading...' : 'Upload cover image'}
+                        <input
+                          type="file"
+                          accept="image/*"
+                          onChange={handleCoverImageUpload}
+                          disabled={uploadingCover}
+                          className="hidden"
+                        />
+                      </label>
+                    )}
+                  </div>
+
                   {/* Content Editor with Preview */}
                   <div className="space-y-2">
-                    <label className="text-sm font-medium text-gray-300">Content (Markdown) *</label>
+                    <div className="flex items-center justify-between">
+                      <label className="text-sm font-medium text-gray-300">Content (Markdown) *</label>
+                      <label className="flex items-center gap-2 px-3 py-1.5 bg-gray-700 border border-gray-600 rounded-md text-xs text-gray-300 hover:bg-gray-600 cursor-pointer">
+                        <FaImage />
+                        {uploadingInline ? 'Uploading...' : 'Insert image'}
+                        <input
+                          type="file"
+                          accept="image/*"
+                          onChange={handleInlineImageUpload}
+                          disabled={uploadingInline}
+                          className="hidden"
+                        />
+                      </label>
+                    </div>
                     <div className={`grid ${showPreview ? 'grid-cols-2' : 'grid-cols-1'} gap-4`}>
                       <div>
                         <textarea
+                          ref={contentTextareaRef}
                           value={content}
                           onChange={(e) => setContent(e.target.value)}
                           required
@@ -285,7 +388,15 @@ const Admin = () => {
                       {showPreview && (
                         <div className="bg-gray-700 border border-gray-600 rounded-md p-4 overflow-auto max-h-[400px]">
                           <div className="prose prose-invert prose-sm max-w-none">
-                            <ReactMarkdown remarkPlugins={[remarkGfm]}>
+                            <ReactMarkdown
+                              remarkPlugins={[remarkGfm]}
+                              components={{
+                                img: ({ ...props }) => (
+                                  // eslint-disable-next-line jsx-a11y/alt-text
+                                  <img {...props} loading="lazy" className="max-w-full h-auto rounded-md my-4" />
+                                ),
+                              }}
+                            >
                               {content || '*No content to preview*'}
                             </ReactMarkdown>
                           </div>

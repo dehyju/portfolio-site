@@ -117,6 +117,15 @@ const BlogPost = () => {
           {/* Title */}
           <h1 className="text-4xl md:text-5xl font-bold mb-6">{post.title}</h1>
 
+          {/* Cover image */}
+          {post.cover_image_url && (
+            <img
+              src={post.cover_image_url}
+              alt=""
+              className="w-full max-h-96 object-cover rounded-lg mb-6"
+            />
+          )}
+
           {/* Meta information */}
           <div className="flex flex-wrap items-center gap-4 text-gray-400 mb-6 pb-6 border-b border-gray-700">
             <span className="flex items-center gap-2">
@@ -148,7 +157,15 @@ const BlogPost = () => {
 
           {/* Content */}
           <div className="prose prose-invert max-w-none">
-            <ReactMarkdown remarkPlugins={[remarkGfm]}>
+            <ReactMarkdown
+              remarkPlugins={[remarkGfm]}
+              components={{
+                img: ({ ...props }) => (
+                  // eslint-disable-next-line jsx-a11y/alt-text
+                  <img {...props} loading="lazy" className="w-full max-w-full h-auto rounded-lg my-6 mx-auto" />
+                ),
+              }}
+            >
               {post.content}
             </ReactMarkdown>
           </div>

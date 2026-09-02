@@ -66,7 +66,16 @@ const Blog = () => {
             <div className="space-y-6">
               {posts.map((post) => (
                 <Link key={post.id} to={`/blog/${post.slug}`}>
-                  <Card className="bg-gray-800 border-gray-700 hover:border-gray-600 transition-all duration-200 hover:shadow-lg hover:shadow-blue-500/10">
+                  <Card className="bg-gray-800 border-gray-700 hover:border-gray-600 transition-all duration-200 hover:shadow-lg hover:shadow-blue-500/10 flex flex-col sm:flex-row overflow-hidden">
+                    {post.cover_image_url && (
+                      <img
+                        src={post.cover_image_url}
+                        alt=""
+                        loading="lazy"
+                        className="w-full sm:w-56 h-40 sm:h-auto object-cover"
+                      />
+                    )}
+                    <div className="flex-1">
                     <CardHeader>
                       <div className="flex items-start justify-between gap-4">
                         <div className="flex-1">
@@ -116,6 +125,7 @@ const Blog = () => {
                         </div>
                       )}
                     </CardContent>
+                    </div>
                   </Card>
                 </Link>
               ))}
