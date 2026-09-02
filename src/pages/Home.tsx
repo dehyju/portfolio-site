@@ -165,7 +165,7 @@ const Home = () => {
                             className="border-gray-700 hover:border-blue-400 hover:bg-blue-950/30 text-white"
                         >
                             <a 
-                                href="mailto:stephen.t.j.leong@gmail.com" 
+                                href="mailto:b9de38d6dc2448f3802e8ef5548daaac@domainsbyproxy.com" 
                                 aria-label="Email"
                             >
                                 <IoIosMail className="mr-2 h-5 w-5" />
