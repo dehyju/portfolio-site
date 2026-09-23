@@ -50,6 +50,17 @@ const BlogPost = () => {
     fetchPost();
   }, [slug, user]);
 
+  useEffect(() => {
+    if (!post) return;
+
+    const previousTitle = document.title;
+    document.title = `${post.title} | Stephen's Portfolio`;
+
+    return () => {
+      document.title = previousTitle;
+    };
+  }, [post]);
+
   const formatDate = (dateString: string) => {
     return new Date(dateString).toLocaleDateString("en-US", {
       year: "numeric",
